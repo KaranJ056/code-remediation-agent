@@ -11,34 +11,32 @@ const PASSWORD = "password123";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/login", (req, res) => {
-    const { username, password } = req.body;
-    if (username === USERNAME && password === PASSWORD) {
-        res.send("Access granted");
-    } else {
-        res.send("Access denied");
-    }
+  const { username, password } = req.body;
+  if (username === USERNAME && password === PASSWORD) {
+    res.send("Access granted");
+  } else {
+    res.send("Access denied");
+  }
 });
 
 app.get("/user", (req, res) => {
-    const username = req.query.username;
-    
-    const query = `SELECT * FROM users WHERE username = '${username}';`;
-    console.log("Executing Query:", query);
+  const username = req.query.username;
 
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            res.status(500).send("Database error");
-        } else {
-            res.json(rows);
-        }
-    });
+  const query = `SELECT * FROM users WHERE username = ?`;
+  db.all(query, [username], (err, rows) => {
+    if (err) {
+      res.status(500).send("Database error");
+    } else {
+      res.json(rows); 
+    }
+  });
 });
 
 app.get("/greet", (req, res) => {
-    const name = req.query.name;
-    res.send(`<h1>Hello, ${name}</h1>`); // No input sanitization
+  const name = encodeURIComponent(req.query.name);
+  res.send(`<h1>Hello, ${name}</h1>`);
 });
 
 app.listen(3000, () => {
-    console.log("Server running on port 3000");
+  console.log("Server running on port 3000");  
 });
